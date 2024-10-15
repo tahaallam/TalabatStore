@@ -7,7 +7,7 @@ namespace Talabat.APIs
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +20,21 @@ namespace Talabat.APIs
             builder.Services.AddDbContext<StoreContext>(Options =>
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            }); 
+            });
             var app = builder.Build();
+            using var Scope = app.Services.CreateScope();
+            var Services = Scope.ServiceProvider;
+            var LoggerFactory = Services.GetRequiredService<ILoggerFactory>();
+            try
+            {
+                var DbContext = Services.GetRequiredService<StoreContext>();
+                await DbContext.Database.MigrateAsync();
+            }
+            catch (Exception ex)
+            {
+                var Logger = LoggerFactory.CreateLogger<Program>();
+                Logger.LogError(ex, "An Error Occurred During Updating DataBase");
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
