@@ -9,7 +9,7 @@ namespace Talabat.Core.Repositories
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
-        Task<IEnumerable<T>> GetAll();
-        Task<T> GetById(int id);
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
     }
 }

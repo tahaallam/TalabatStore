@@ -24,6 +24,8 @@ namespace Talabat.APIs
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+           // builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             var app = builder.Build();
             using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
@@ -39,8 +41,6 @@ namespace Talabat.APIs
                 var Logger = LoggerFactory.CreateLogger<Program>();
                 Logger.LogError(ex, "An Error Occurred During Updating DataBase");
             }
-            //builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
