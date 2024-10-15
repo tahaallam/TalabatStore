@@ -1,6 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Talabat.Core.Entities;
+using Talabat.Core.Repositories;
+using Talabat.Repository;
 using Talabat.Repository.Data;
 
 namespace Talabat.APIs
@@ -36,7 +39,8 @@ namespace Talabat.APIs
                 var Logger = LoggerFactory.CreateLogger<Program>();
                 Logger.LogError(ex, "An Error Occurred During Updating DataBase");
             }
-
+            //builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
