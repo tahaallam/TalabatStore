@@ -1,6 +1,10 @@
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Talabat.APIs.Errors;
+using Talabat.APIs.Helper;
+using Talabat.APIs.Middlewares;
 using Talabat.Core.Entities;
 using Talabat.Core.Repositories;
 using Talabat.Repository;
@@ -26,6 +30,23 @@ namespace Talabat.APIs
             });
            // builder.Services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.Configure<ApiBehaviorOptions>(Options => {
+                Options.InvalidModelStateResponseFactory = (actioncontext)=>
+                {
+                    var errors = actioncontext.ModelState.Where(P => P.Value.Errors.Count() > 0)
+                                                        .SelectMany(P => P.Value.Errors)
+                                                        .Select(E => E.ErrorMessage)
+                                                        .ToArray();
+                    var ValidationErrorResponse = new ApiValidationErrorResponse()
+                    {
+                        Errors = errors
+                    };
+                    return new BadRequestObjectResult(ValidationErrorResponse);
+                };
+            });
+
+
             var app = builder.Build();
             using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
@@ -44,10 +65,12 @@ namespace Talabat.APIs
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                //app.UseMiddleware<ExceptionMiddleware>();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseStaticFiles();
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
