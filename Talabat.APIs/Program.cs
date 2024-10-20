@@ -65,11 +65,12 @@ namespace Talabat.APIs
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseMiddleware<ExceptionMiddleware>();
+                //app.UseMiddleware<ExceptionMiddleware>();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
             app.UseStaticFiles();
+            app.UseStatusCodePagesWithReExecute("/Errors/{0}");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
