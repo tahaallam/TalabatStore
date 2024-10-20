@@ -70,7 +70,7 @@ namespace Talabat.APIs
                 app.UseSwaggerUI();
             }
             app.UseStaticFiles();
-            app.UseStatusCodePagesWithReExecute("/Errors/{0}");
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
