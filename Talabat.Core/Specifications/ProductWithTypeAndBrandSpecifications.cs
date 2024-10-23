@@ -9,7 +9,10 @@ namespace Talabat.Core.Specifications
 {
     public class ProductWithTypeAndBrandSpecifications :BaseSpecifications<Product>
     {
-        public ProductWithTypeAndBrandSpecifications(string? Sort):base()
+        public ProductWithTypeAndBrandSpecifications(string? Sort , int? BrandId , int? TypeId):base(P=>
+        (!BrandId.HasValue|| P.ProductBrandId==BrandId)&&
+        (!TypeId.HasValue|| P.ProductTypeId==TypeId)
+            )
         {
             Includes.Add(P=>P.ProductType);
             Includes.Add(P => P.ProductBrand);
