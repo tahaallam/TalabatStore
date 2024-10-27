@@ -11,6 +11,7 @@ using Talabat.Core.Entities;
 using Talabat.Core.Repositories;
 using Talabat.Repository;
 using Talabat.Repository.Data;
+using Talabat.Repository.Identity;
 
 namespace Talabat.APIs
 {
@@ -30,7 +31,10 @@ namespace Talabat.APIs
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
+            builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
+            {
+                Options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
             builder.Services.AddSingleton<IConnectionMultiplexer>(Options =>
             {
                 var Connection = builder.Configuration.GetConnectionString("RedisConnection"); 
@@ -48,6 +52,8 @@ namespace Talabat.APIs
             {
                 var DbContext = Services.GetRequiredService<StoreContext>();
                 await DbContext.Database.MigrateAsync();
+                var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
+                await IdentityDbContext.Database.MigrateAsync();
                 await StoreContextSeed.SeedAsync(DbContext);
             }
             catch (Exception ex)
