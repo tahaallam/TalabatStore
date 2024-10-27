@@ -7,14 +7,16 @@ using Talabat.Core.Entities.Identity;
 
 namespace Talabat.APIs.Controllers
 {
-   
+
     public class AccountController : ApiBaseController
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(UserManager<AppUser> userManager)
+        public AccountController(UserManager<AppUser> userManager , SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
         [HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
@@ -26,16 +28,31 @@ namespace Talabat.APIs.Controllers
                 UserName = model.Email.Split('@')[0],
                 PhoneNumber = model.PhoneNumber,
             };
-          var result =  await _userManager.CreateAsync(User , model.Password);
+            var result = await _userManager.CreateAsync(User, model.Password);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             var ReturnedUser = new UserDto()
             {
-                DisplayName = User.DisplayName ,
-                Email = User.Email ,
+                DisplayName = User.DisplayName,
+                Email = User.Email,
                 Token = "this will be token"
             };
             return Ok(ReturnedUser);
-          
+
         }
+        [HttpPost("Login")]
+        public async Task<ActionResult<UserDto>> Login(LoginDto model)
+        {
+            var User = await _userManager.FindByEmailAsync(model.Email);
+            if (User is null) return Unauthorized(new ApiResponse(401));
+            var Result = await _signInManager.CheckPasswordSignInAsync(User, model.Password, false);
+            if (!Result.Succeeded) return Unauthorized(new ApiResponse(401));
+            return Ok(new UserDto()
+            {
+                DisplayName = User.DisplayName,
+                Email = User.Email,
+                Token = "This Will Be Token"
+            }); 
+        }
+
     }
 }
