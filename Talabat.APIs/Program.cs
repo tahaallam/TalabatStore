@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using Talabat.APIs.Extensions;
 using Talabat.APIs.Helper;
 using Talabat.APIs.Middlewares;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Identity;
 using Talabat.Core.Repositories;
 using Talabat.Repository;
 using Talabat.Repository.Data;
@@ -41,8 +43,10 @@ namespace Talabat.APIs
                 return ConnectionMultiplexer.Connect(Connection);
             });
 
-            builder.Services.AddApplicationServices();
 
+
+            builder.Services.AddApplicationServices();
+            builder.Services.AddIdentityService();
 
             var app = builder.Build();
             using var Scope = app.Services.CreateScope();
@@ -54,6 +58,8 @@ namespace Talabat.APIs
                 await DbContext.Database.MigrateAsync();
                 var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
                 await IdentityDbContext.Database.MigrateAsync();
+                var UserManager = Services.GetRequiredService<UserManager<AppUser>>();
+                await AppIdentityDbContextSeed.SeedUserAsync(UserManager);
                 await StoreContextSeed.SeedAsync(DbContext);
             }
             catch (Exception ex)
