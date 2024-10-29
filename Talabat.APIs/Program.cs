@@ -46,7 +46,7 @@ namespace Talabat.APIs
 
 
             builder.Services.AddApplicationServices();
-            builder.Services.AddIdentityService();
+            builder.Services.AddIdentityService(builder.Configuration);
 
             var app = builder.Build();
             using var Scope = app.Services.CreateScope();
@@ -76,10 +76,8 @@ namespace Talabat.APIs
             app.UseStaticFiles();
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
