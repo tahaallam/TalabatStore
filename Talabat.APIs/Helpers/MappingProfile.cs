@@ -2,6 +2,7 @@
 using Talabat.APIs.DTOs;
 using Talabat.APIs.Helpers;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Identity;
 
 namespace Talabat.APIs.Helper
 {
@@ -13,7 +14,7 @@ namespace Talabat.APIs.Helper
                 .ForMember(D => D.ProductType, O => O.MapFrom(S => S.ProductType.Name))
                 .ForMember(D => D.ProductBrand, O => O.MapFrom(S => S.ProductBrand.Name))
                 .ForMember(D => D.PictureUrl, O => O.MapFrom<ProductPictureUrlResolver>());
-                ;
+            CreateMap<Address, AddressDto>();     
         }
     }
 }
