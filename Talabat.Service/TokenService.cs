@@ -26,7 +26,7 @@ namespace Talabat.Service
         {
             var AuthClaims = new List<Claim>()
             {
-                new Claim(ClaimTypes.GivenName , User.DisplayName),
+                new Claim(ClaimTypes.GivenName , User.UserName),
                 new Claim(ClaimTypes.Email , User.Email)
             };
             var UserRoles = await userManager.GetRolesAsync(User);
@@ -41,7 +41,7 @@ namespace Talabat.Service
                 audience: configuration["JWT:ValidAudience"],
                 expires:DateTime.Now.AddDays(double.Parse(configuration["JWT:DurationInDays"])) ,
                 claims:AuthClaims ,
-               signingCredentials:new SigningCredentials(AuthKey ,SecurityAlgorithms.Aes128CbcHmacSha256)
+               signingCredentials:new SigningCredentials(AuthKey ,SecurityAlgorithms.HmacSha256Signature)
                 );
             return  new JwtSecurityTokenHandler().WriteToken(Token);
             
