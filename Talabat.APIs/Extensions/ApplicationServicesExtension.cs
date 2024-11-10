@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Helper;
+using Talabat.Core;
 using Talabat.Core.Repositories;
+using Talabat.Core.Services;
 using Talabat.Repository;
+using Talabat.Service;
 
 namespace Talabat.APIs.Extensions
 {
@@ -28,6 +31,8 @@ namespace Talabat.APIs.Extensions
                     return new BadRequestObjectResult(ValidationErrorResponse);
                 };
             });
+            Services.AddScoped<IUnitOfWork , UnitOfWork>();
+            Services.AddScoped<IOrderService, OrderService>();
             return Services;
         }
     }

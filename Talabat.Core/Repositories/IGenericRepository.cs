@@ -20,5 +20,8 @@ namespace Talabat.Core.Repositories
 
         #endregion
         Task<int> GetCountWithSpecAsync(ISpecifications<T> Spec);
+        Task AddAsync(T item);
+        void Update(T item);
+        void Delete(T item);
     }
 }
