@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Talabat.APIs.DTOs;
 using Talabat.APIs.Errors;
+using Talabat.Core;
 using Talabat.Core.Entities.Order_Aggregate;
 using Talabat.Core.Services;
 
@@ -16,11 +17,13 @@ namespace Talabat.APIs.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrderController(IOrderService orderService ,IMapper mapper)
+        public OrderController(IOrderService orderService ,IMapper mapper ,IUnitOfWork unitOfWork)
         {
             _orderService = orderService;
             _mapper = mapper;
+            this._unitOfWork = unitOfWork;
         }
         [ProducesResponseType(typeof(Order) ,StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse) , StatusCodes.Status400BadRequest)]
@@ -52,7 +55,7 @@ namespace Talabat.APIs.Controllers
         [ProducesResponseType(typeof(OrderToReturnDto), StatusCodes.Status200OK)]
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrderByIdForUser(int id)
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(int id)
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
            var order = await _orderService.GetOrderByIdForSpecificUserAsync(email, id);
@@ -60,6 +63,12 @@ namespace Talabat.APIs.Controllers
             var MappedOrder =_mapper.Map<Order , OrderToReturnDto>(order); 
             return Ok(MappedOrder);
 
+        }
+        [HttpGet("DeliveryMethod")]
+        public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
+        {
+            var DeliveryMethod= await _unitOfWork.Repository<DeliveryMethod>().GetAllAsync();
+            return Ok(DeliveryMethod);
         }
 
     }
