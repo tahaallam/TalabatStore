@@ -36,19 +36,20 @@ namespace Talabat.APIs.Controllers
             return Ok(Order);
         }
         [ProducesResponseType(typeof(ApiResponse) , StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(IReadOnlyList<Order>) ,StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IReadOnlyList<OrderToReturnDto>) ,StatusCodes.Status200OK)]
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IReadOnlyList<Order>>> GetOrdersForSpecificUser()
+        public async Task<ActionResult<IReadOnlyList<OrderToReturnDto>>> GetOrdersForSpecificUser()
         {
             var Email = User.FindFirstValue(ClaimTypes.Email);
             var Orders =await _orderService.GetOrdersForSpecificUserAsync(Email);
             if (Orders is null) return NotFound(new ApiResponse(404,"No Orders For This User"));
-            return Ok(Orders) ;
+            var MappedOrder = _mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderItemDto>>(Orders); 
+            return Ok(MappedOrder) ;
             
         }
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OrderToReturnDto), StatusCodes.Status200OK)]
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrderByIdForUser(int id)
@@ -56,7 +57,8 @@ namespace Talabat.APIs.Controllers
             var email = User.FindFirstValue(ClaimTypes.Email);
            var order = await _orderService.GetOrderByIdForSpecificUserAsync(email, id);
             if (order is null) return NotFound(new ApiResponse(404, "No Orders with this id For This User"));
-            return Ok(order);
+            var MappedOrder =_mapper.Map<Order , OrderToReturnDto>(order); 
+            return Ok(MappedOrder);
 
         }
 
