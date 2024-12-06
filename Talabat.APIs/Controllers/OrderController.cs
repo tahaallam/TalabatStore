@@ -47,7 +47,7 @@ namespace Talabat.APIs.Controllers
             var Email = User.FindFirstValue(ClaimTypes.Email);
             var Orders =await _orderService.GetOrdersForSpecificUserAsync(Email);
             if (Orders is null) return NotFound(new ApiResponse(404,"No Orders For This User"));
-            var MappedOrder = _mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderItemDto>>(Orders); 
+            var MappedOrder = _mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderToReturnDto>>(Orders); 
             return Ok(MappedOrder) ;
             
         }
